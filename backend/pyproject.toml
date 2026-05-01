@@ -1,0 +1,22 @@
+[project]
+name = "cochino-py-backend"
+version = "0.1.0"
+description = "Backend for the Cochino List application"
+authors = [
+    { name = "Mike F", email = "your.email@example.com" }
+]
+dependencies = [
+    "fastapi==0.136.1",
+    "uvicorn",
+    "pydantic==2.12.0",
+    "psycopg2-binary==2.9.11",
+    "sqlalchemy==2.0.49",
+    "alembic",
+]
+
+[tool.setuptools]
+packages = ["app"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
