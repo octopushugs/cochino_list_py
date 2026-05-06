@@ -1,12 +1,27 @@
+from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from fastapi import FastAPI, Depends, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 from typing import List
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+from .services import ScrapeAndPopulateService
 from . import models, schemas, database
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup logic
+    scheduler = AsyncIOScheduler()
+    scraper = ScrapeAndPopulateService()
+    # Schedule the job to run every day at midnight (hour=0, minute=0)
+    scheduler.add_job(scraper.populate_closures_job, 'cron', hour=0, minute=0)
+    scheduler.start()
+    yield
+    # Shutdown logic
+    scheduler.shutdown()
+
+app = FastAPI(lifespan=lifespan)
 
 @app.get("/establishments", response_model=List[schemas.EstablishmentBase])
 def read_establishments(
