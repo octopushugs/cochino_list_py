@@ -25,9 +25,9 @@ def upgrade() -> None:
     sa.Column('uuid', sa.UUID, unique=True, nullable=False),
     sa.Column('establishment_id', sa.Integer, sa.ForeignKey('establishments.id'), nullable=False),
     sa.Column('closed_on', sa.DateTime, nullable=False),
-    sa.Column('reopened_on', sa.DateTime, nullable=False),
-    sa.Column('reason', sa.String(1_000), nullable=False),
-    sa.Column('result', sa.String(255), nullable=False),
+    sa.Column('reopened_on', sa.DateTime),
+    sa.Column('reason', sa.String(1_000)),
+    sa.Column('result', sa.String(255)),
     sa.Column('created_at', sa.DateTime, nullable=False),
     sa.Column('updated_at', sa.DateTime, nullable=False),
   )

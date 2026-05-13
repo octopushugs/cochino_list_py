@@ -1,7 +1,7 @@
 from datetime import datetime
-from sqlalchemy.orm import Session
-from .. import database # Import database to get SessionLocal
-# from . import models # Uncomment if you need to interact with models directly
+
+from .scrape import ScrapeService
+from .populate import PopulateService
 
 class ScrapeAndPopulateService:
   def __init__(self):
@@ -12,14 +12,25 @@ class ScrapeAndPopulateService:
 
   async def populate_closures_job(self):
     """
-    Background job to populate or process closure data.
-    This method manages its own database session.
-    """
-    print(f"Executing daily closure population job at {datetime.now()}")
-    # Create a new session for this background job
-    with database.SessionLocal() as db:
-      # Here you would add your database logic, e.g.,
-      # - Fetching external data and storing it
-      # - Cleaning up old records
-      # - Generating reports
-      print(f"ClosureService: populate_closures_job is using a DB session at {datetime.now()}")
+    Background job to scrape closure data and populate the database.
+    """    
+    print(f"Executing daily scrape and populate job at {datetime.now()}")
+    print("Starting data scraping...")
+
+    scrape_service = ScrapeService()
+    scraped_data = await scrape_service.scrape_closures()
+    print(f"Finished scraping. Found {len(scraped_data)} records.")
+
+    if scraped_data:
+      print("Starting database population...")
+      populate_service = PopulateService()
+      populate_service.populate_records(scraped_data)
+      print("Finished database population.")
+    else:
+      print("No data scraped, skipping database population.")
+
+# Allows the script to be run directly from the command line for manual scraping and population
+if __name__ == "__main__":
+    import asyncio
+    service = ScrapeAndPopulateService()
+    asyncio.run(service.populate_closures_job())
